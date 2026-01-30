@@ -10,13 +10,13 @@ using Vertices = std::vector<Vertex>;
 using Indices = std::vector<GLint>;
 
 #include "file_obj.hpp" // load objs from file
-#include "quad.hpp"
-#include "box.hpp"
-#include "icosphere.hpp"
-#include "cylinder.hpp"
-#include "wedge.hpp"
-#include "corner_wedge_outer.hpp"
-#include "corner_wedge_inner.hpp"
+#include "shapes/quad.hpp"
+#include "shapes/box.hpp"
+#include "shapes/icosphere.hpp"
+#include "shapes/cylinder.hpp"
+#include "shapes/wedge.hpp"
+#include "shapes/corner_wedge_outer.hpp"
+#include "shapes/corner_wedge_inner.hpp"
 
 
 class InstantiableMesh;
