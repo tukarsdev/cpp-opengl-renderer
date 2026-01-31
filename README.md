@@ -1,3 +1,7 @@
-Currently crashes the moment there's any input when launching in debug mode. Release mode works fine. Possibly due to a build error since it didn't happen when I was building using visual studio.
+To do a release build: `python build.py`
+To do a debug build: `python build.py --debug`
+To do a clean release: `python build.py --clean`
+To do a clean debug: `python build.py --clean --debug`
 
-To run (I have only tested this on windows 10): `sh build.sh`
+The build script will run the executable immediately.
+Currently untested on linux.

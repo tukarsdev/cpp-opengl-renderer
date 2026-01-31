@@ -65,6 +65,7 @@ private:
 	}
 
 	void process_mouse_move(double x, double y) {
+
 		if (self.mouse_locked) {
 			self.mouse_dx += x - self.mouse_last_x;
 			self.mouse_dy += y - self.mouse_last_y;
@@ -90,20 +91,20 @@ public:
 
 		self.wm = wm;
 
-		wm->set_keyboard_input_callback([&input](Key key, int state) {
-			input->process_key_input(key, state);
+		wm->set_keyboard_input_callback([input_ptr = input.get()](Key key, int state) {
+			input_ptr->process_key_input(key, state);
 		});
 
-		wm->set_mouse_button_callback([&input](Key key, int state) {
-			input->process_key_input(key, state);
+		wm->set_mouse_button_callback([input_ptr = input.get()](Key key, int state) {
+			input_ptr->process_key_input(key, state);
 		});
 
-		wm->set_mouse_move_callback([&input](double x, double y) {
-			input->process_mouse_move(x, y);
+		wm->set_mouse_move_callback([input_ptr = input.get()](double x, double y) {
+			input_ptr->process_mouse_move(x, y);
 		});
 
-		wm->set_mouse_scroll_callback([&input](double x, double y) {
-			input->process_mouse_scroll(x, y);
+		wm->set_mouse_scroll_callback([input_ptr = input.get()](double x, double y) {
+			input_ptr->process_mouse_scroll(x, y);
 		});
 
 		self.mouse_locked = wm->get_mouse_locked();

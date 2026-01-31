@@ -4,6 +4,10 @@ project(renderer LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
 set(SOURCES
     src/main.cpp
     include/GL/gl3w.c
@@ -11,43 +15,59 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# Fetch dependencies
+include(FetchContent)
+
+# GLFW
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.4
+)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+if(MSVC)
+    set(USE_MSVC_RUNTIME_LIBRARY_DLL ON CACHE BOOL "" FORCE)
+endif()
+
+# GLM (header-only, no build step)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 1.0.1  # Or use "master" for latest
+)
+
+FetchContent_MakeAvailable(glfw glm)
+
+# Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/GL
-    ${CMAKE_SOURCE_DIR}/include/GLFW
-    ${CMAKE_SOURCE_DIR}/include/glm
     ${CMAKE_SOURCE_DIR}/include/KHR
     ${CMAKE_SOURCE_DIR}/src
 )
 
+# Link libraries
 if(WIN32)
-    set(GLFW_LIB_DIR ${CMAKE_SOURCE_DIR}/lib/glfw-3.4.bin.WIN64)
-    
-    if(MSVC)
-        target_link_directories(${PROJECT_NAME} PRIVATE ${GLFW_LIB_DIR}/lib-vc2022)
-        target_link_libraries(${PROJECT_NAME} PRIVATE glfw3 opengl32)
-    elseif(MINGW)
-        target_link_directories(${PROJECT_NAME} PRIVATE ${GLFW_LIB_DIR}/lib-mingw-w64)
-        target_link_libraries(${PROJECT_NAME} PRIVATE glfw3 opengl32)
-    endif()
+    target_link_libraries(${PROJECT_NAME} PRIVATE glfw glm::glm opengl32)
+elseif(APPLE)
+    find_library(OPENGL_LIBRARY OpenGL REQUIRED)
+    find_library(COCOA_LIBRARY Cocoa REQUIRED)
+    find_library(IOKIT_LIBRARY IOKit REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        glfw
+        glm::glm
+        ${OPENGL_LIBRARY}
+        ${COCOA_LIBRARY}
+        ${IOKIT_LIBRARY}
+    )
 else()
-    find_package(glfw3 REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
-    
-    if(APPLE)
-        find_library(OPENGL_LIBRARY OpenGL REQUIRED)
-        find_library(COCOA_LIBRARY Cocoa REQUIRED)
-        find_library(IOKIT_LIBRARY IOKit REQUIRED)
-        target_link_libraries(${PROJECT_NAME} PRIVATE
-            ${OPENGL_LIBRARY}
-            ${COCOA_LIBRARY}
-            ${IOKIT_LIBRARY}
-        )
-    else()
-        target_link_libraries(${PROJECT_NAME} PRIVATE GL dl)
-    endif()
+    target_link_libraries(${PROJECT_NAME} PRIVATE glfw glm::glm GL dl)
 endif()
 
+# Copy resources
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/src/shaders
