@@ -15,10 +15,8 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# Fetch dependencies
 include(FetchContent)
 
-# GLFW
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -32,16 +30,14 @@ if(MSVC)
     set(USE_MSVC_RUNTIME_LIBRARY_DLL ON CACHE BOOL "" FORCE)
 endif()
 
-# GLM (header-only, no build step)
 FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
-    GIT_TAG 1.0.1  # Or use "master" for latest
+    GIT_TAG 1.0.1
 )
 
 FetchContent_MakeAvailable(glfw glm)
 
-# Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/GL
@@ -49,7 +45,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
 
-# Link libraries
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE glfw glm::glm opengl32)
 elseif(APPLE)
@@ -67,7 +62,6 @@ else()
     target_link_libraries(${PROJECT_NAME} PRIVATE glfw glm::glm GL dl)
 endif()
 
-# Copy resources
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/src/shaders
