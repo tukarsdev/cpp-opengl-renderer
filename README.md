@@ -6,6 +6,7 @@ To do a clean release: `python3 build.py --clean`
 
 To do a clean debug: `python3 build.py --clean --debug`
 
+Depending on how python is installed, you may need to use `python` instead of `python3`.
 
 The build script will run the executable immediately.
 
