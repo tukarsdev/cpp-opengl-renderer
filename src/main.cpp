@@ -1,3 +1,8 @@
+#ifdef __linux__
+#include <unistd.h>
+#include <linux/limits.h>
+#endif
+
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
