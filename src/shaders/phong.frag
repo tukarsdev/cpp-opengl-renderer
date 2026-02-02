@@ -36,6 +36,7 @@ const float attc = 1.f;
 const float bias_s = 0.007f;
 const float bias_m = 0.007f;
 const float point_bias = 0.005f;
+const float shadow_min = 0.25f;
 
 vec3 calc_diff_spec(float diff, float spec, int i) {
 	vec3 diff_l = diff * diff_strength * lights[i].col * frag_col.xyz;
@@ -87,6 +88,7 @@ vec3 calculate_directional_contribution(int i) {
 
 	vec3 N_to_light = normalize(-lights[i].dir);
 	float shadow = shadow_frag(i, N_to_light);
+	shadow = max(shadow, shadow_min);
 	vec3 diff_spec = calc_diff_spec(diff, spec, i);
 	vec3 phong = shadow * diff_spec;
 
@@ -116,6 +118,7 @@ vec3 calculate_spot_contribution(int i) {
 	float intensity = smoothstep(cos_outer, cos_inner, theta);
 
 	float shadow = shadow_frag(i, to_light);
+	shadow = max(shadow, shadow_min);
 	vec3 diff_spec = calc_diff_spec(diff, spec, i);
 	vec3 phong = shadow * diff_spec * att * intensity;
 
@@ -137,6 +140,7 @@ vec3 calculate_positional_contribution(int i) {
 	float att = 1.0 / (attc + (lights[i].attl * d) + (lights[i].attq * d * d));
 	
 	float shadow = shadow_frag_positional(i);
+	shadow = max(shadow, shadow_min);
 	vec3 diff_spec = calc_diff_spec(diff, spec, i);
 	vec3 phong = shadow * diff_spec * att;
 
