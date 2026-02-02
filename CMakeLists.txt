@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(renderer LANGUAGES C CXX)
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/include/GL)
+include_directories(${CMAKE_SOURCE_DIR}/include/KHR)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -40,8 +44,6 @@ FetchContent_MakeAvailable(glfw glm)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include/GL
-    ${CMAKE_SOURCE_DIR}/include/KHR
     ${CMAKE_SOURCE_DIR}/src
 )
 
