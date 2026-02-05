@@ -59,6 +59,8 @@ Tested on windows, ubuntu, fedora (headless), and arch (headless).
 
 On windows you will need to use visual studio to download the necessary SDK and MSVC dependencies.
 
+---
+
 ### Dependencies
 
 To build this project you need `cmake`.
@@ -74,56 +76,100 @@ You will need `docker` installed.
 
 ### Linux
 
-The following lists the packages you need for your operating system of choice, as well as the install command.
+To build this project on Linux, you'll need to install several development dependencies.
+These are mostly dependencies of GLFW, necessary for creating windows and various interactions, such as capturing keyboard input, mouse, etc.
+The exact package names vary depending on your distribution. Below are the commands for the most common ones.
 
-#### Ubuntu (`apt` based)
+---
 
-* `pkg-config`
-* `libgl1-mesa-dev`
-* `libwayland-dev`
-* `wayland-protocols`
-* `libxkbcommon-dev`
-* `libx11-dev`
-* `libxrandr-dev`
-* `libxinerama-dev`
-* `libxcursor-dev`
-* `libxi-dev`
+#### Ubuntu / Debian (`apt` based)
+
+Required packages:
+- `pkg-config` – helps cmake locate system libraries
+- `libgl1-mesa-dev` – OpenGL development files
+- `libwayland-dev`, `wayland-protocols` – Wayland support
+- `libxkbcommon-dev` – keyboard input handling
+- `libx11-dev`, `libxrandr-dev`, `libxinerama-dev`, `libxcursor-dev`, `libxi-dev` – X11 windowing and input support
+
+
+
+Install command:
 
 ```bash
-sudo apt install pkg-config libgl1-mesa-dev libwayland-dev wayland-protocols libxkbcommon-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+sudo apt update
+sudo apt install \
+    pkg-config \
+    libgl1-mesa-dev \
+    libwayland-dev \
+    wayland-protocols \
+    libxkbcommon-dev \
+    libx11-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libxcursor-dev \
+    libxi-dev
 ```
+
+---
 
 #### Fedora (`dnf` based)
 
-* `pkgconfig`
-* `mesa-libGL-devel`
-* `wayland-devel`
-* `wayland-protocols-devel`
-* `libxkbcommon-devel`
-* `libX11-devel`
-* `libXrandr-devel`
-* `libXinerama-devel`
-* `libXcursor-devel`
-* `libXi-devel`
+Required packages:
 
+- `pkgconfig` – equivalent of pkg-config
+- `mesa-libGL-devel` – OpenGL development files
+- `wayland-devel`, `wayland-protocols-devel` – Wayland support
+- `libxkbcommon-devel` – keyboard input handling
+- `libX11-devel`, `libXrandr-devel`, `libXinerama-devel`, `libXcursor-devel`, `libXi-devel` – X11 windowing and input support
+
+Install command:
 ```bash
-sudo dnf install pkgconfig mesa-libGL-devel wayland-devel wayland-protocols-devel libxkbcommon-devel libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel
+sudo dnf install \
+    pkgconfig \
+    mesa-libGL-devel \
+    wayland-devel \
+    wayland-protocols-devel \
+    libxkbcommon-devel \
+    libX11-devel \
+    libXrandr-devel \
+    libXinerama-devel \
+    libXcursor-devel \
+    libXi-devel
 ```
 
-#### Arch (`pacman` based)
+---
 
-* `pkg-config`
-* `libglvnd`
-* `wayland`
-* `wayland-protocols`
-* `libxkbcommon`
-* `libx11`
-* `libxrandr`
-* `libxinerama`
-* `libxcursor`
-* `libxi`
- 
+#### Arch Linux (`pacman` based)
+
+
+Required packages:
+
+- `pkg-config` – build configuration tool
+- `libglvnd` – vendor-neutral OpenGL support
+- `wayland`, `wayland-protocols` – Wayland support
+- `libxkbcommon` – keyboard input handling
+- `libx11`, `libxrandr`, `libxinerama`, `libxcursor`, `libxi` – X11 windowing and input support
+
+Install command:
+
 ```bash
-sudo pacman -S pkg-config libglvnd wayland wayland-protocols libxkbcommon libx11 libxrandr libxinerama libxcursor libxi
+sudo pacman -S \
+    pkg-config \
+    libglvnd \
+    wayland \
+    wayland-protocols \
+    libxkbcommon \
+    libx11 \
+    libxrandr \
+    libxinerama \
+    libxcursor \
+    libxi
 ```
+
+---
+Tip:
+
+If you're building inside a minimal container or CI environment, make sure to also install `cmake`, `git`, and your compiler toolchain (`clang` or `gcc`, `make` or `ninja`).
+
+
 
