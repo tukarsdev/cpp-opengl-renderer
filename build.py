@@ -16,25 +16,29 @@ def run_command(cmd, shell=False, step_name="", log_stderr=True):
     printable_cmd = " ".join(cmd) if isinstance(cmd, list) else cmd
     pretty_name = f"[{step_name}]" if step_name else ""
     print(f"\n{pretty_name}:\n> {printable_cmd}")
-
-    try:
+    
+    try: 
         result = subprocess.run(
             cmd, 
             shell=shell, 
-            stderr=subprocess.PIPE, 
-            text=True,
-            check=True
+            stderr=subprocess.PIPE,
+            text=True
         )
-    except subprocess.CalledProcessError as e:
-        exit_code = hex(e.returncode).upper()
-        if log_stderr: print_stderr(e.stderr)
-        return (exit_code, e.stderr or "")
+        
+        if result.returncode != 0:
+            hex_returncode = hex(result.returncode)
+            hex_returnpretty = hex_returncode[:2] + hex_returncode[2:].upper()
+            print(f"The program exited with code: {hex_returnpretty}")
+            
+            if result.stderr != "" and log_stderr:
+                print(result.stderr)
+            
+            return (result.returncode, result.stderr)
     except FileNotFoundError:
-        if log_stderr: print_stderr(e.stderr)
         sys.exit(f"Command not found: {cmd[0]}")
     except Exception as e:
-        if log_stderr: print_stderr(e.stderr)
         sys.exit(f"Unexpected error during {step_name or 'command'}: {e}")
+    
     return (0, "")
 
 def is_headless():
@@ -45,8 +49,8 @@ def detect_cmake_generator(is_windows):
     unix_fallback = "Unix Makefiles"
     windows_fallback = "Visual Studio 17 2022"
     
-    if shutil.which("ninja"):
-        return "Ninja"
+    # if shutil.which("ninja"):
+    #     return "Ninja"
 
     if is_windows:
         try:
@@ -96,7 +100,7 @@ def build_configuration_files_command(cmake_generator):
 def build_configuration_files(cmake_generator):
     (exit_code, stderr_res) = build_configuration_files_command(cmake_generator)
     if exit_code != 0:
-        print("There was an error generating make files:")
+        print("There was an error generating configuration files:")
         print_stderr(stderr_res)
         print("Cleaning build directory and trying again.")
         clean_build()
@@ -105,6 +109,12 @@ def build_configuration_files(cmake_generator):
             print("There was an error generating the configuration files:")
             print_stderr(stderr_res)
             return
+
+def build_step(build_type):
+    run_command(
+        ["cmake", "--build", BUILD_DIR, "--config", build_type], step_name="CMake build"
+    )
+
 
 def run_executable(is_windows, build_type):
     exe_name = "renderer.exe" if is_windows else "renderer"
@@ -128,6 +138,8 @@ def run_executable(is_windows, build_type):
         step_name="Run executable",
     )
 
+# key note: need to not keep deleting dependencies folder
+
 def main():
     parser = argparse.ArgumentParser(description="Cross-platform CMake build script")
     parser.add_argument("--debug", action="store_true", help="Build in Debug mode")
@@ -148,13 +160,8 @@ def main():
         clean_build()
     
     build_configuration_files(cmake_generator)
-    
-    run_command(
-        ["cmake", "--build", BUILD_DIR, "--config", build_type], step_name="CMake build"
-    )
-    
+    build_step(build_type)
     run_executable(is_windows, build_type)
-    
 
 if __name__ == "__main__":
     main()
